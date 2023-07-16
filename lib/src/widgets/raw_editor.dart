@@ -1531,22 +1531,27 @@ class RawEditorState extends EditorState
 
     if (widget.onImagePaste != null) {
       final image = await Pasteboard.image;
-
+      var index = textEditingValue.selection.end;
       if (image == null) {
-        return;
-      }
+        final filePaths = await Pasteboard.files();
+        for (final filePath in filePaths) {
+          for (final extensionName in imageFileExtensions) {
+            if (filePath.endsWith(extensionName)) {
+              final image = File(filePath).readAsBytesSync();
 
-      final imageUrl = await widget.onImagePaste!(image);
-      if (imageUrl == null) {
-        return;
+              final imageUrl = await widget.onImagePaste!(image);
+              if (imageUrl != null) {
+                controller.replaceText(
+                  index++,
+                  0,
+                  BlockEmbed.image(imageUrl),
+                  null,
+                );
+              }
+            }
+          }
+        }
       }
-
-      controller.replaceText(
-        textEditingValue.selection.end,
-        0,
-        BlockEmbed.image(imageUrl),
-        null,
-      );
     }
   }
 
@@ -2688,3 +2693,13 @@ class _GlyphHeights {
   final double startGlyphHeight;
   final double endGlyphHeight;
 }
+
+const imageFileExtensions = <String>[
+  '.jpeg',
+  '.png',
+  '.jpg',
+  '.gif',
+  '.webp',
+  '.tif',
+  '.heic'
+];
