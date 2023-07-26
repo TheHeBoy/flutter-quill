@@ -128,14 +128,15 @@ class RawEditor extends StatefulWidget {
   final QuillEditorContextMenuBuilder? contextMenuBuilder;
 
   static Widget defaultContextMenuBuilder(
-    BuildContext context,
-    RawEditorState state,
-  ) {
+      BuildContext context, RawEditorState state,
+      [TapUpDetails? details]) {
     return TextFieldTapRegion(
       child: AdaptiveTextSelectionToolbar.buttonItems(
-        buttonItems: state.contextMenuButtonItems,
-        anchors: state.contextMenuAnchors,
-      ),
+          buttonItems: state.contextMenuButtonItems,
+          anchors: details == null
+              ? state.contextMenuAnchors
+              : TextSelectionToolbarAnchors(
+                  primaryAnchor: details.globalPosition)),
     );
   }
 
@@ -1271,7 +1272,8 @@ class RawEditorState extends EditorState
         clipboardStatus: _clipboardStatus,
         contextMenuBuilder: widget.contextMenuBuilder == null
             ? null
-            : (context) => widget.contextMenuBuilder!(context, this),
+            : (context, [details]) =>
+                widget.contextMenuBuilder!(context, this, details),
       );
       _selectionOverlay!.handlesVisible = _shouldShowSelectionHandles();
       _selectionOverlay!.showHandles();
@@ -1396,7 +1398,7 @@ class RawEditorState extends EditorState
   /// Returns `false` if a toolbar couldn't be shown, such as when the toolbar
   /// is already shown, or when no text selection currently exists.
   @override
-  bool showToolbar() {
+  bool showToolbar([TapUpDetails? details]) {
     // Web is using native dom elements to enable clipboard functionality of the
     // toolbar: copy, paste, select, cut. It might also provide additional
     // functionality depending on the browser (such as translate). Due to this
@@ -1417,7 +1419,7 @@ class RawEditorState extends EditorState
     }
 
     _selectionOverlay!.update(textEditingValue);
-    _selectionOverlay!.showToolbar();
+    _selectionOverlay!.showToolbar(details);
     return true;
   }
 
@@ -2680,9 +2682,8 @@ class InsertEmbedIntent extends Intent {
 ///  * [EditableTextContextMenuBuilder], which performs the same role for
 ///    [EditableText]
 typedef QuillEditorContextMenuBuilder = Widget Function(
-  BuildContext context,
-  RawEditorState rawEditorState,
-);
+    BuildContext context, RawEditorState rawEditorState,
+    [TapUpDetails? details]);
 
 class _GlyphHeights {
   _GlyphHeights(

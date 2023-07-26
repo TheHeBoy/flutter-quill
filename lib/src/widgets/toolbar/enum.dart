@@ -29,4 +29,5 @@ enum ToolbarButtons {
   indentDecrease,
   link,
   search,
+  image,
 }

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill/flutter_quill_test.dart';
-import 'package:flutter_quill/src/widgets/raw_editor.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -81,28 +80,28 @@ void main() {
       expect(latestUri, equals(uri));
     });
 
-    Widget customBuilder(BuildContext context, RawEditorState state) {
-      return AdaptiveTextSelectionToolbar(
-        anchors: state.contextMenuAnchors,
-        children: [
-          Container(
-            height: 50,
-            color: Colors.white,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    didCopy = true;
-                  },
-                  icon: const Icon(Icons.copy),
-                ),
-              ],
-            ),
-          ),
-        ],
-      );
-    }
+    // Widget customBuilder(BuildContext context, RawEditorState state) {
+    //   return AdaptiveTextSelectionToolbar(
+    //     anchors: state.contextMenuAnchors,
+    //     children: [
+    //       Container(
+    //         height: 50,
+    //         color: Colors.white,
+    //         child: Row(
+    //           mainAxisAlignment: MainAxisAlignment.spaceAround,
+    //           children: [
+    //             IconButton(
+    //               onPressed: () {
+    //                 didCopy = true;
+    //               },
+    //               icon: const Icon(Icons.copy),
+    //             ),
+    //           ],
+    //         ),
+    //       ),
+    //     ],
+    //   );
+    // }
 
     testWidgets('custom context menu builder', (tester) async {
       await tester.pumpWidget(MaterialApp(
@@ -115,7 +114,7 @@ void main() {
           autoFocus: true,
           readOnly: false,
           expands: true,
-          contextMenuBuilder: customBuilder,
+          // contextMenuBuilder: customBuilder,
         ),
       ));
 

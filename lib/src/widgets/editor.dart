@@ -49,7 +49,7 @@ abstract class EditorState extends State<RawEditor>
   /// Returns true if the editor has been marked as needing to be rebuilt.
   bool get dirty;
 
-  bool showToolbar();
+  bool showToolbar([TapUpDetails? details]);
 
   void requestKeyboard();
 }
@@ -101,7 +101,7 @@ abstract class RenderAbstractEditor implements TextLayoutMetrics {
   ///
   /// When [ignorePointer] is true, an ancestor widget must respond to tap
   /// down events by calling this method.
-  void handleTapDown(TapDownDetails details);
+  void handleTapDown(details);
 
   /// Selects the set words of a paragraph in a given range of global positions.
   ///
@@ -624,7 +624,9 @@ class _QuillEditorSelectionGestureDetectorBuilder
   @override
   void onForcePressStart(ForcePressDetails details) {
     super.onForcePressStart(details);
-    if (delegate.selectionEnabled && shouldShowSelectionToolbar) {
+    if (delegate.selectionEnabled &&
+        shouldShowSelectionToolbar &&
+        !onlyShowRightMenu) {
       editor!.showToolbar();
     }
   }
@@ -1074,7 +1076,7 @@ class RenderEditor extends RenderEditableContainerBox
   TextSelection? _extendSelectionOrigin;
 
   @override
-  void handleTapDown(TapDownDetails details) {
+  void handleTapDown(details) {
     _lastTapDownPosition = details.globalPosition;
   }
 

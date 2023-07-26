@@ -138,7 +138,7 @@ class EditorTextSelectionOverlay {
   /// {@macro flutter.widgets.EditableText.contextMenuBuilder}
   ///
   /// If not provided, no context menu will be built.
-  final WidgetBuilder? contextMenuBuilder;
+  final contextMenuBuilder;
 
   /// Determines the way that drag start behavior is handled.
   ///
@@ -218,11 +218,11 @@ class EditorTextSelectionOverlay {
   }
 
   /// Shows the toolbar by inserting it into the [context]'s overlay.
-  void showToolbar() {
+  void showToolbar([TapUpDetails? details]) {
     assert(toolbar == null);
     if (contextMenuBuilder == null) return;
     toolbar = OverlayEntry(builder: (context) {
-      return contextMenuBuilder!(context);
+      return contextMenuBuilder!(context,details);
     });
     Overlay.of(context, rootOverlay: true, debugRequiredFor: debugRequiredFor)
         .insert(toolbar!);

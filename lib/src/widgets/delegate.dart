@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -85,6 +87,8 @@ class EditorTextSelectionGestureDetectorBuilder {
   /// a stylus.
   bool shouldShowSelectionToolbar = true;
 
+  bool onlyShowRightMenu = Platform.isWindows || Platform.isMacOS;
+
   bool detectWordBoundary = true;
 
   /// The [State] of the [EditableText] for which the builder will provide a
@@ -166,7 +170,7 @@ class EditorTextSelectionGestureDetectorBuilder {
       null,
       SelectionChangedCause.forcePress,
     );
-    if (shouldShowSelectionToolbar) {
+    if (shouldShowSelectionToolbar && !onlyShowRightMenu) {
       editor!.showToolbar();
     }
   }
@@ -190,8 +194,19 @@ class EditorTextSelectionGestureDetectorBuilder {
   @protected
   void onSecondarySingleTapUp(TapUpDetails details) {
     // added to show toolbar by right click
-    if (shouldShowSelectionToolbar) {
-      editor!.showToolbar();
+    if (shouldShowSelectionToolbar && onlyShowRightMenu) {
+      renderEditor!.handleTapDown(details);
+      editor!.hideToolbar();
+      if(renderEditor!.selection.isCollapsed){
+        renderEditor!
+          ..selectPosition(cause: SelectionChangedCause.tap)
+          ..onSelectionCompleted();
+        Future.delayed(const Duration(milliseconds: 100), () {
+          editor!.showToolbar(details);
+        });
+      }else{
+        editor!.showToolbar(details);
+      }
     }
   }
 
@@ -256,7 +271,7 @@ class EditorTextSelectionGestureDetectorBuilder {
   ///  which triggers this callback.
   @protected
   void onSingleLongTapEnd(LongPressEndDetails details) {
-    if (shouldShowSelectionToolbar) {
+    if (shouldShowSelectionToolbar && !onlyShowRightMenu) {
       editor!.showToolbar();
     }
   }
@@ -281,7 +296,7 @@ class EditorTextSelectionGestureDetectorBuilder {
       // have focus, selection hasn't been set when the toolbars
       // get added
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        if (shouldShowSelectionToolbar) {
+        if (shouldShowSelectionToolbar && !onlyShowRightMenu) {
           editor!.showToolbar();
         }
       });
@@ -331,7 +346,7 @@ class EditorTextSelectionGestureDetectorBuilder {
     renderEditor!.handleDragEnd(details);
     if (isDesktop() &&
         delegate.selectionEnabled &&
-        shouldShowSelectionToolbar) {
+        shouldShowSelectionToolbar && !onlyShowRightMenu) {
       // added to show selection copy/paste toolbar after drag to select
       editor!.showToolbar();
     }
